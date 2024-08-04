@@ -82,6 +82,12 @@ func (c *Crawler) ExtractLinks(url string) {
 		c.logger.Warn(err) // Log the error
 		return
 	}
+	// Non 200 status code handling
+	if res.StatusCode != http.StatusOK {
+		c.logger.Warnf("Received non-200 status code: %d", res.StatusCode)
+		return
+	}
+
 	defer res.Body.Close() // Ensure the response body is closed after use
 
 	// Check if the response status code is 200 OK
