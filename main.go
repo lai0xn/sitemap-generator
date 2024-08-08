@@ -76,6 +76,10 @@ func (c *Crawler) ExtractLinks(url string) {
 		return
 	}
 
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+
 	// Perform the HTTP request
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -106,7 +110,7 @@ func (c *Crawler) ExtractLinks(url string) {
 	// Find and process all anchor tags
 	doc.Find("a").Each(func(i int, item *goquery.Selection) {
 		href, exists := item.Attr("href") // Extract the href attribute
-		if exists && strings.HasPrefix(href, c.baseUrl) {
+		if (exists && strings.HasPrefix(href, c.baseUrl)) || strings.HasPrefix(href, "/") && exists {
 			c.mu.Lock() // Lock the mutex to safely update shared data
 			if _, seen := c.seen[href]; !seen {
 				c.seen[href] = struct{}{} // Mark the URL as seen
